@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Next.js generates route/type validators under `.next/types/`.
+# If these appear under `types/` at repo root, they're stray copies.
+/types/routes.d.ts
+/types/validator.ts
+/types/cache-life.d.ts

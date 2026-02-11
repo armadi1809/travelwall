@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Next.js generated helpers (not intended for linting):
+    "types/**",
   ]),
 ]);
 

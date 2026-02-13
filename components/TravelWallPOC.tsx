@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import WorldMap from "./WorldMap";
 import { countries } from "@/constants/countries";
+import { LoginButton } from "./LoginButton";
+import { authClient } from "@/utils/auth-client";
 
 type SelectedCountry = {
   id: string;
@@ -18,6 +20,9 @@ type Photo = {
 export default function TravelWallPOC() {
   const [selected, setSelected] = useState<SelectedCountry | null>(null);
   const [photosById, setPhotosById] = useState<Record<string, Photo>>({});
+  const { data } = authClient.useSession();
+
+  const userName = data?.user?.name ?? "";
 
   const selectedPhoto = useMemo(() => {
     if (!selected) return null;
@@ -53,9 +58,9 @@ export default function TravelWallPOC() {
           </div>
           <div className="flex items-center gap-3">
             <span className="rounded-full border border-slate-700/70 bg-slate-900/60 px-3 py-1 text-sm text-slate-200 shadow-sm">
-              Golden Hour Atlas
+              {userName}
             </span>
-            <span className="text-sm text-slate-300/80">No login (yet)</span>
+            <LoginButton />
           </div>
         </div>
       </header>

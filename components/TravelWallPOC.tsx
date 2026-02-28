@@ -57,9 +57,11 @@ export default function TravelWallPOC() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <span className="rounded-full border border-slate-700/70 bg-slate-900/60 px-3 py-1 text-sm text-slate-200 shadow-sm">
-              {userName}
-            </span>
+            {userName && (
+              <span className="rounded-full border border-slate-700/70 bg-slate-900/60 px-3 py-1 text-sm text-slate-200 shadow-sm">
+                {userName}
+              </span>
+            )}
             <LoginButton />
           </div>
         </div>
@@ -69,7 +71,9 @@ export default function TravelWallPOC() {
         <section className="rounded-2xl border border-slate-800/70 bg-slate-900/40 p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between">
             <div className="text-sm text-slate-300/80">
-              Visited countries: {visitedCountries}
+              {userName
+                ? `Visited countries: ${visitedCountries}`
+                : "Please log in to start tracking your visited countries."}
             </div>
             <div className="text-sm">
               {selected ? (
@@ -91,74 +95,76 @@ export default function TravelWallPOC() {
           </div>
         </section>
 
-        <aside className="rounded-2xl border border-slate-800/70 bg-slate-900/40 p-5 shadow-sm">
-          <h2 className="text-base font-semibold">Upload</h2>
-          <p className="mt-1 text-sm text-slate-300/80">
-            {selected
-              ? `Add a travel photo for ${selected.name}. (Stored in-memory only.)`
-              : "Pick a country on the map to start."}
-          </p>
+        {userName && (
+          <aside className="rounded-2xl border border-slate-800/70 bg-slate-900/40 p-5 shadow-sm">
+            <h2 className="text-base font-semibold">Upload</h2>
+            <p className="mt-1 text-sm text-slate-300/80">
+              {selected
+                ? `Add a travel photo for ${selected.name}. (Stored in-memory only.)`
+                : "Pick a country on the map to start."}
+            </p>
 
-          <div className="mt-4 space-y-3">
-            <label className="block">
-              <span className="mb-2 block text-sm font-medium">Photo</span>
-              <input
-                type="file"
-                accept="image/*"
-                disabled={!selected}
-                className="block w-full text-sm file:mr-4 file:rounded-full file:border-0 file:bg-teal-500 file:px-4 file:py-2 file:text-white hover:file:bg-teal-400 disabled:opacity-50"
-                onChange={(e) => {
-                  const country = selected;
-                  const file = e.currentTarget.files?.[0];
-                  if (!country || !file) return;
+            <div className="mt-4 space-y-3">
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium">Photo</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  disabled={!selected}
+                  className="block w-full text-sm file:mr-4 file:rounded-full file:border-0 file:bg-teal-500 file:px-4 file:py-2 file:text-white hover:file:bg-teal-400 disabled:opacity-50"
+                  onChange={(e) => {
+                    const country = selected;
+                    const file = e.currentTarget.files?.[0];
+                    if (!country || !file) return;
 
-                  const url = URL.createObjectURL(file);
+                    const url = URL.createObjectURL(file);
 
-                  setPhotosById((prev) => {
-                    const existing = prev[country.id];
-                    if (existing) URL.revokeObjectURL(existing.url);
-                    return {
-                      ...prev,
-                      [country.id]: { url, fileName: file.name },
-                    };
-                  });
+                    setPhotosById((prev) => {
+                      const existing = prev[country.id];
+                      if (existing) URL.revokeObjectURL(existing.url);
+                      return {
+                        ...prev,
+                        [country.id]: { url, fileName: file.name },
+                      };
+                    });
 
-                  e.currentTarget.value = "";
-                }}
-              />
-            </label>
+                    e.currentTarget.value = "";
+                  }}
+                />
+              </label>
 
-            {selected && selectedPhoto ? (
-              <div className="rounded-xl border border-slate-800/70 bg-slate-950/40 p-3 shadow-sm">
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-medium">
-                      {selectedPhoto.fileName}
+              {selected && selectedPhoto ? (
+                <div className="rounded-xl border border-slate-800/70 bg-slate-950/40 p-3 shadow-sm">
+                  <div className="mb-2 flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium">
+                        {selectedPhoto.fileName}
+                      </div>
+                      <div className="text-xs text-slate-300/80">Preview</div>
                     </div>
-                    <div className="text-xs text-slate-300/80">Preview</div>
+                    <button
+                      type="button"
+                      className="rounded-full border border-slate-700/70 bg-slate-900/60 px-3 py-1 text-sm hover:bg-slate-900"
+                      onClick={() => clearPhoto(selected.id)}
+                    >
+                      Clear
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    className="rounded-full border border-slate-700/70 bg-slate-900/60 px-3 py-1 text-sm hover:bg-slate-900"
-                    onClick={() => clearPhoto(selected.id)}
-                  >
-                    Clear
-                  </button>
+                  <div className="relative aspect-4/3 w-full overflow-hidden rounded-lg bg-slate-900">
+                    <Image
+                      src={selectedPhoto.url}
+                      alt={`Travel photo for ${selected.name}`}
+                      fill
+                      unoptimized
+                      className="object-cover"
+                      sizes="(min-width: 768px) 360px, 100vw"
+                    />
+                  </div>
                 </div>
-                <div className="relative aspect-4/3 w-full overflow-hidden rounded-lg bg-slate-900">
-                  <Image
-                    src={selectedPhoto.url}
-                    alt={`Travel photo for ${selected.name}`}
-                    fill
-                    unoptimized
-                    className="object-cover"
-                    sizes="(min-width: 768px) 360px, 100vw"
-                  />
-                </div>
-              </div>
-            ) : null}
-          </div>
-        </aside>
+              ) : null}
+            </div>
+          </aside>
+        )}
       </main>
     </div>
   );

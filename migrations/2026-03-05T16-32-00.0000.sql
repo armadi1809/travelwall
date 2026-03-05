@@ -1,0 +1,1 @@
+create table "photo" ("id" text not null primary key, "url" text not null, "userId" text not null references "user" ("id") on delete cascade, "createdAt" date not null);

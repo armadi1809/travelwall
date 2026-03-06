@@ -6,6 +6,7 @@ import WorldMap from "./WorldMap";
 import { countries } from "@/constants/countries";
 import { LoginButton } from "./LoginButton";
 import { authClient } from "@/utils/auth-client";
+import { UploadButton } from "@/utils/uploadthing";
 
 type SelectedCountry = {
   id: string;
@@ -107,28 +108,17 @@ export default function TravelWallPOC() {
             <div className="mt-4 space-y-3">
               <label className="block">
                 <span className="mb-2 block text-sm font-medium">Photo</span>
-                <input
-                  type="file"
-                  accept="image/*"
+                <UploadButton
                   disabled={!selected}
-                  className="block w-full text-sm file:mr-4 file:rounded-full file:border-0 file:bg-teal-500 file:px-4 file:py-2 file:text-white hover:file:bg-teal-400 disabled:opacity-50"
-                  onChange={(e) => {
-                    const country = selected;
-                    const file = e.currentTarget.files?.[0];
-                    if (!country || !file) return;
-
-                    const url = URL.createObjectURL(file);
-
-                    setPhotosById((prev) => {
-                      const existing = prev[country.id];
-                      if (existing) URL.revokeObjectURL(existing.url);
-                      return {
-                        ...prev,
-                        [country.id]: { url, fileName: file.name },
-                      };
-                    });
-
-                    e.currentTarget.value = "";
+                  endpoint="imageUploader"
+                  onClientUploadComplete={(res) => {
+                    // Do something with the response
+                    console.log("Files: ", res);
+                    alert("Upload Completed");
+                  }}
+                  onUploadError={(error: Error) => {
+                    // Do something with the error.
+                    alert(`ERROR! ${error.message}`);
                   }}
                 />
               </label>
